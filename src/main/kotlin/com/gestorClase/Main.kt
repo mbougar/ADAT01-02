@@ -3,7 +3,6 @@ package com.gestorClase
 import com.gestorClase.repositorio.CalificacionesCSV
 import com.gestorClase.servicio.CalculadoraNotas
 import com.gestorClase.servicio.ClasificadorAlumnos
-import com.gestorClase.servicio.GestorCalificaciones
 import kotlin.io.path.Path
 
 /**
@@ -22,6 +21,13 @@ fun main() {
     val calculadoraNotas = CalculadoraNotas()
     val clasificador = ClasificadorAlumnos()
 
-    val gestor = GestorCalificaciones(csvManager, calculadoraNotas, clasificador)
-    gestor.ejecutar(rutaFichero)
+    val alumnos = csvManager.leerCalificaciones(rutaFichero)
+    val alumnosConNotas = calculadoraNotas.asignarNotaFinal(alumnos)
+    val (aprobados, suspensos) = clasificador.clasificar(alumnosConNotas)
+
+    println("Alumnos aprobados:")
+    aprobados.forEach { println("${it.nombre} ${it.apellidos}: Nota final = %.2f}".format(it.notaFinal)) }
+
+    println("\nAlumnos suspensos:")
+    suspensos.forEach { println("${it.nombre} ${it.apellidos}: Nota final = %.2f}".format(it.notaFinal)) }
 }
